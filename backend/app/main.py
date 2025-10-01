@@ -1,3 +1,8 @@
+# Ensure runtime patches are applied before importing FastAPI and its
+# dependencies. This prevents issues with Python 3.13 and older Pydantic
+# releases that FastAPI still depends on.
+from . import pycompat  # noqa: F401
+
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
