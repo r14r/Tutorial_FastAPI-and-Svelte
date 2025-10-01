@@ -37,8 +37,8 @@ export async function getProfile() {
   return response.data;
 }
 
-export async function getItems() {
-  const response = await client.get("/items");
+export async function getItems(params = {}) {
+  const response = await client.get("/items", { params });
   return response.data;
 }
 
