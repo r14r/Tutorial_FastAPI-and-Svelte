@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "target": "ES2020"
+  },
+  "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.svelte"],
+  "exclude": ["node_modules/*", "dist/*"]
+}
