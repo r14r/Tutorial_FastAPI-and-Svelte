@@ -13,7 +13,7 @@ install-pyproject:
 	uv pip install -r pyproject.toml
 	
 serve:
-	streamlit run app.py
+	uvicorn app.main:app --reload
 
 run: serve
 
