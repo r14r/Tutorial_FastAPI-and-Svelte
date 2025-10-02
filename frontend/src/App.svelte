@@ -11,6 +11,7 @@
   import CrudPage from "./pages/Crud.svelte";
   import DatabasePage from "./pages/Database.svelte";
   import CorePage from "./pages/Core.svelte";
+  import ChatGPTPage from "./pages/ChatGPT.svelte";
 
   const sections = [
     {
@@ -56,6 +57,15 @@
         "Play with reactivity, bindings, and stores in an isolated playground that mirrors the workshop exercises.",
       href: "/core",
       icon: "✨",
+      requiresAuth: false
+    },
+    {
+      id: "workspace",
+      title: "ChatGPT workspace",
+      description:
+        "Explore a recreated ChatGPT interface with curated prompts, team projects, and custom GPTs.",
+      href: "/chatgpt",
+      icon: "🤖",
       requiresAuth: false
     }
   ];
@@ -104,7 +114,8 @@
     ["/auth", AuthPage],
     ["/crud", CrudPage],
     ["/database", DatabasePage],
-    ["/core", CorePage]
+    ["/core", CorePage],
+    ["/chatgpt", ChatGPTPage]
   ]);
 
   let openMenu = null;
