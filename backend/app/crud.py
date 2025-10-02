@@ -15,6 +15,8 @@ def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
 
 
 def create_user(db: Session, user: schemas.UserCreate) -> models.User:
+    print(__file__, "password=", user.password)
+    
     hashed_password = get_password_hash(user.password)
     db_user = models.User(email=user.email, hashed_password=hashed_password)
     db.add(db_user)
