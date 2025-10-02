@@ -32,3 +32,28 @@ if sys.version_info >= (3, 13):  # pragma: no cover - runtime safeguard
         )
 
     ForwardRef._evaluate = _patched_evaluate  # type: ignore[attr-defined]
+
+    # SQLAlchemy 2.0.41 tightened its ``TypingOnly`` guard in a way that became
+    # incompatible with Python 3.13's updated ``typing`` module. The ORM defines
+    # a few helper classes that intentionally inherit from ``TypingOnly`` while
+    # also providing extra attributes which now triggers an ``AssertionError``
+    # during import. The upstream project relaxed this guard in later releases,
+    # but pinning a patched version is not always possible for workshop
+    # attendees. To keep the tutorial code runnable we soften the guard locally
+    # by ignoring that specific assertion while letting other errors bubble up.
+    try:  # pragma: no cover - defensive import
+        from sqlalchemy.util import langhelpers
+    except Exception:  # pragma: no cover - SQLAlchemy might not be installed yet
+        langhelpers = None  # type: ignore[assignment]
+
+    if langhelpers is not None:  # pragma: no branch - simple runtime patch
+        _orig_init_subclass = langhelpers.TypingOnly.__init_subclass__
+
+        def _patched_init_subclass(cls, *args, **kwargs):
+            try:
+                _orig_init_subclass(cls, *args, **kwargs)
+            except AssertionError as exc:
+                if "directly inherits TypingOnly" not in str(exc):
+                    raise
+
+        langhelpers.TypingOnly.__init_subclass__ = _patched_init_subclass  # type: ignore[assignment]
