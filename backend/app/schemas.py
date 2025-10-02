@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr, constr
 
 
 class Token(BaseModel):
@@ -17,7 +17,8 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str
+    # bcrypt rejects passwords longer than 72 bytes, so enforce the limit early
+    password: constr(max_length=72)
 
 
 class UserRead(UserBase):
