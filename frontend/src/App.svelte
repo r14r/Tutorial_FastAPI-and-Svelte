@@ -42,6 +42,7 @@
   const pageMap = new Map(pages.map((page) => [page.id, page]));
 
   let activePage = pages[0].id;
+  let activeDefinition = pages[0];
   let profileError = "";
   let loadingProfile = false;
 
@@ -82,9 +83,14 @@
     activePage = "crud";
   }
 
-  $: activeDefinition = pageMap.get(activePage) ?? pages[0];
-  $: if (!$token && activeDefinition.requiresAuth) {
-    activePage = "auth";
+  $: {
+    const definition = pageMap.get(activePage) ?? pages[0];
+    if (!$token && definition.requiresAuth) {
+      activePage = "auth";
+      activeDefinition = pageMap.get("auth") ?? pages[0];
+    } else {
+      activeDefinition = definition;
+    }
   }
 </script>
 
