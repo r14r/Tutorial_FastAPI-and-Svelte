@@ -27,8 +27,8 @@
   <article class="hero">
     <h2>Build a modern full-stack app</h2>
     <p>
-      This tutorial pairs a FastAPI backend with a freshly upgraded SvelteKit front-end. Use the sidebar to
-      navigate through each feature and dive into real examples that you can adapt to your own projects.
+      This tutorial pairs a FastAPI backend with a modern Svelte front-end. Use the sidebar to navigate
+      through each feature and dive into real examples that you can adapt to your own projects.
     </p>
   </article>
 

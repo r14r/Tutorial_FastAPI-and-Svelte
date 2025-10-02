@@ -1,18 +1,23 @@
 <script>
-  import "../app.css";
+  import "./app.css";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import { browser } from "$app/environment";
   import { getProfile } from "$lib/api";
   import { currentUser, token } from "$stores/auth";
+  import HomePage from "./pages/Home.svelte";
+  import AuthPage from "./pages/Auth.svelte";
+  import CrudPage from "./pages/Crud.svelte";
+  import DatabasePage from "./pages/Database.svelte";
+  import CorePage from "./pages/Core.svelte";
 
   const sections = [
     {
       id: "overview",
-      title: "Welcome to the FastAPI + SvelteKit tutorial",
+      title: "Welcome to the FastAPI + Svelte tutorial",
       description:
-        "Learn how the FastAPI backend and the SvelteKit front-end work together while exploring the demo application.",
+        "Learn how the FastAPI backend and the Svelte front-end work together while exploring the demo application.",
       href: "/",
       icon: "🏠",
       requiresAuth: false
@@ -86,13 +91,21 @@
         },
         {
           href: "https://kit.svelte.dev/docs",
-          label: "SvelteKit documentation",
-          description: "Learn more about routing, data loading, and adapters in SvelteKit.",
+          label: "Svelte documentation",
+          description: "Learn more about components, reactivity, and the framework ecosystem.",
           external: true
         }
       ]
     }
   ];
+
+  const routeComponents = new Map([
+    ["/", HomePage],
+    ["/auth", AuthPage],
+    ["/crud", CrudPage],
+    ["/database", DatabasePage],
+    ["/core", CorePage]
+  ]);
 
   let openMenu = null;
   let sidebarOpen = false;
@@ -100,6 +113,7 @@
   let profileError = "";
   let profileLoaded = false;
   let lastPath = null;
+  let menuBarElement = null;
 
   function normalizePath(pathname) {
     if (!pathname) return "/";
@@ -111,6 +125,7 @@
 
   $: currentPath = normalizePath($page.url.pathname);
   $: activeDefinition = sectionMap.get(currentPath) ?? sectionMap.get("/");
+  $: currentComponent = routeComponents.get(currentPath) ?? routeComponents.get("/");
 
   function requiresAuth(pathname) {
     return sectionMap.get(pathname)?.requiresAuth ?? false;
@@ -195,7 +210,12 @@
   onMount(() => {
     if (!browser) return;
 
-    const handleDocumentClick = () => closeMenu();
+    const handleDocumentClick = (event) => {
+      if (menuBarElement?.contains(event.target)) {
+        return;
+      }
+      closeMenu();
+    };
     const handleKeydown = (event) => {
       if (event.key === "Escape") {
         closeMenu();
@@ -236,7 +256,7 @@
     <div class="brand" on:click={() => goto("/")} on:keydown={handleBrandKeydown} role="button" tabindex="0">
       <span class="brand-accent">FastAPI</span>
       <span>+</span>
-      <span class="brand-accent">SvelteKit</span>
+      <span class="brand-accent">Svelte</span>
       <span class="muted">tutorial</span>
     </div>
 
@@ -251,7 +271,7 @@
         <span class="sr-only">Toggle sidebar navigation</span>
       </button>
 
-      <nav class="menu-bar" on:click|stopPropagation>
+      <nav class="menu-bar" bind:this={menuBarElement}>
         {#each topMenus as menu}
           <div class="menu" class:open={openMenu === menu.id}>
             <button
@@ -368,7 +388,7 @@
         <div class="alert info">Loading profile…</div>
       {/if}
 
-      <slot />
+      <svelte:component this={currentComponent} />
     </main>
   </div>
 
