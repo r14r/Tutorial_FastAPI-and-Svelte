@@ -3,4 +3,9 @@ uvicorn[standard]==0.27.0
 sqlalchemy>=2.0.41,<2.1
 pydantic[email]==2.6.4
 passlib[bcrypt]==1.7.4
+# Passlib's bcrypt backend is currently incompatible with bcrypt>=4,
+# which removed the ``__about__`` module attribute and tightened password
+# length validation. Pin bcrypt to the 3.x series to avoid runtime errors
+# when hashing passwords during registration.
+bcrypt>=3.2,<4
 python-jose[cryptography]==3.3.0
