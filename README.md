@@ -43,9 +43,12 @@ The backend exposes:
 
 ### Install & run
 
+> **Python version:** The backend is tested with Python 3.11. Ensure your virtual
+> environment uses this interpreter to avoid compatibility issues.
+
 ```bash
 cd backend
-python -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
