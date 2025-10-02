@@ -12,6 +12,10 @@ from . import crud, models, schemas
 from .auth import authenticate_user, create_access_token, get_current_active_user
 from .database import Base, engine, get_db
 
+VERSION = "1.0.2"
+
+print(f"VERSION = {VERSION}")
+
 _ = models  # ensure models are imported for metadata creation
 
 Base.metadata.create_all(bind=engine)
