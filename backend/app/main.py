@@ -9,6 +9,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
+from .ollama import router as ollama_router
 from .auth import authenticate_user, create_access_token, get_current_active_user
 from .database import Base, engine, get_db
 
@@ -29,6 +30,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(ollama_router)
 
 
 @app.get("/")
