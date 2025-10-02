@@ -4,4 +4,4 @@ export ENV_HOME=$PWD
 . venv env        init
 . venv vscode     init
 
-. venv python     init 3.13
+. venv python     init 3.11
