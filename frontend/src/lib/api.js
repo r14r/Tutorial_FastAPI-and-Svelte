@@ -1,6 +1,6 @@
 import axios from "axios";
 import { get } from "svelte/store";
-import { token } from "../stores/auth";
+import { token } from "$stores/auth";
 
 const client = axios.create({
   baseURL: "/api",

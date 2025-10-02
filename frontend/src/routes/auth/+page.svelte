@@ -1,9 +1,7 @@
 <script>
-  import { createEventDispatcher } from "svelte";
-  import { registerUser, loginUser, getProfile } from "../lib/api";
-  import { token, currentUser } from "../stores/auth";
-
-  const dispatch = createEventDispatcher();
+  import { goto } from "$app/navigation";
+  import { registerUser, loginUser, getProfile } from "$lib/api";
+  import { token, currentUser } from "$stores/auth";
 
   let registerForm = { email: "", password: "" };
   let loginForm = { email: "", password: "" };
@@ -24,7 +22,6 @@
       await registerUser(registerForm);
       successMessage = "Registration successful! You can sign in right away.";
       registerForm = { email: "", password: "" };
-      dispatch("registrationSuccess");
     } catch (error) {
       errorMessage = error.response?.data?.detail ?? "Registration failed";
     } finally {
@@ -43,7 +40,7 @@
       currentUser.set(profile);
       successMessage = `Welcome back, ${profile.email}!`;
       loginForm = { email: "", password: "" };
-      dispatch("loginSuccess");
+      await goto("/crud");
     } catch (error) {
       errorMessage = error.response?.data?.detail ?? "Login failed";
     } finally {
@@ -158,21 +155,21 @@
     transition: filter 0.2s ease;
   }
 
-  button:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
+  button:hover {
+    filter: brightness(1.05);
   }
 
-  button:not(:disabled):hover {
-    filter: brightness(1.05);
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   .feedback {
     margin-top: 1.5rem;
     padding: 0.85rem 1rem;
-    border-radius: 0.9rem;
+    border-radius: 1rem;
     font-weight: 600;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.12);
   }
 
   .feedback.error {

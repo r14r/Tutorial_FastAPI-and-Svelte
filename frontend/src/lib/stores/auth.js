@@ -1,12 +1,13 @@
+import { browser } from "$app/environment";
 import { writable } from "svelte/store";
 
-const storedToken = typeof localStorage !== "undefined" ? localStorage.getItem("token") : null;
-const storedUser = typeof localStorage !== "undefined" ? localStorage.getItem("user") : null;
+const storedToken = browser ? localStorage.getItem("token") : null;
+const storedUser = browser ? localStorage.getItem("user") : null;
 
 export const token = writable(storedToken);
 export const currentUser = writable(storedUser ? JSON.parse(storedUser) : null);
 
-if (typeof localStorage !== "undefined") {
+if (browser) {
   token.subscribe((value) => {
     if (value) {
       localStorage.setItem("token", value);
