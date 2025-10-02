@@ -1,734 +1,367 @@
 <script>
-  const promptPresets = [
-    {
-      title: "Brainstorming",
-      description: "Generate creative ideas, strategies, and outlines for any topic.",
-      icon: "💡",
-      suggestions: [
-        "Help me plan a community hackathon weekend.",
-        "Outline a whitepaper about privacy-first AI assistants.",
-        "Brainstorm five marketing angles for a new note taking app."
-      ]
-    },
-    {
-      title: "Writing",
-      description: "Draft blog posts, documentation, and long-form content collaboratively.",
-      icon: "✍️",
-      suggestions: [
-        "Write a release announcement for our latest feature launch.",
-        "Improve the tone of this executive summary and keep it concise.",
-        "Create a welcome email sequence for first-time users."
-      ]
-    },
-    {
-      title: "Data analysis",
-      description: "Interrogate datasets, debug queries, and translate results into insights.",
-      icon: "📊",
-      suggestions: [
-        "Explain why yesterday's retention dropped by 3%.",
-        "Summarize the anomalies in this SQL result.",
-        "Suggest A/B test ideas based on these funnel metrics."
-      ]
-    }
+  const gptMenu = {
+    count: 88,
+    items: [
+      { label: "Erkunden" },
+      { label: "Find Dances" },
+      { label: "L Bollingstedt" },
+      { label: "Codex" }
+    ]
+  };
+
+  const projectMenu = [
+    { label: "Neues Projekt", accent: "+" },
+    { label: "Enrichment: AI" },
+    { label: "Klage E 7" },
+    { label: "Eindiane-community.de" },
+    { label: "Ki-Tools" },
+    { label: "Mehr anzeigen", muted: true }
   ];
 
-  const projectWorkspaces = [
-    {
-      name: "Docs revamp",
-      status: { label: "In review", variant: "in-review" },
-      description:
-        "A shared thread containing the draft documentation for the onboarding flow redesign.",
-      collaborators: ["Alana", "Kai"],
-      updatedAt: "2h ago"
-    },
-    {
-      name: "Customer insights",
-      status: { label: "Active", variant: "active" },
-      description:
-        "Research project that aggregates interview notes and converts them into actionable insights.",
-      collaborators: ["Diego", "Morgan", "Priya"],
-      updatedAt: "Yesterday"
-    },
-    {
-      name: "Roadmap planning",
-      status: { label: "Scheduled", variant: "scheduled" },
-      description:
-        "Workspace for quarterly planning with preloaded prompts and product requirement templates.",
-      collaborators: ["Zara"],
-      updatedAt: "Mon"
-    }
+  const quickPrompts = [
+    "Skizziere einen Projektplan für dieses Quartal.",
+    "Erstelle eine Executive Summary zum letzten Sprint.",
+    "Welche Erkenntnisse liefern unsere Support-Tickets?",
+    "Formuliere Ziele für das nächste Team-Meeting."
   ];
 
-  const customGPTs = [
-    {
-      name: "Release note polisher",
-      description: "Specialized in translating technical changelogs into user-friendly release notes.",
-      capabilities: ["Tone matching", "Localization", "Style guardrails"],
-      accent: "🎉"
-    },
-    {
-      name: "Data detective",
-      description: "Inspects dashboards, SQL, and spreadsheets to draft concise analytic briefings.",
-      capabilities: ["CSV parsing", "SQL reasoning", "Chart explanation"],
-      accent: "🕵️"
-    },
-    {
-      name: "Code reviewer",
-      description: "Offers pull-request friendly reviews with actionable improvement suggestions.",
-      capabilities: ["Lint awareness", "Complexity scoring", "Testing tips"],
-      accent: "🧑‍💻"
-    }
-  ];
-
-  const chatThreads = [
-    {
-      id: "product-sync",
-      title: "Produkt-Sync",
-      lastActive: "Assistant • vor 2 Stunden",
-      messages: [
-        {
-          role: "user",
-          content: "Summarize the last product sync and highlight next steps for the mobile team."
-        },
-        {
-          role: "assistant",
-          content:
-            "Here is a concise recap of the sync along with the follow-up owners: \n\n• Ship beta build to TestFlight — Morgan\n• Prepare usability survey — Priya\n• Update crash monitoring alerts — Diego"
-        }
-      ]
-    },
-    {
-      id: "marketing-ideas",
-      title: "Marketingideen",
-      lastActive: "Du • gestern",
-      messages: [
-        {
-          role: "user",
-          content: "Brainstorm five marketing angles for our new onboarding tutorial."
-        },
-        {
-          role: "assistant",
-          content:
-            "Consider positioning around: \n\n1. Rapid setup in under 5 minutes\n2. Built-in analytics to prove ROI\n3. Collaborative reviews with inline feedback\n4. Enterprise-ready security defaults\n5. Seamless integrations with the current stack"
-        }
-      ]
-    },
-    {
-      id: "support-update",
-      title: "Support-Update",
-      lastActive: "Assistant • Montag",
-      messages: [
-        {
-          role: "user",
-          content: "Draft a status message informing customers about the resolved outage from this morning."
-        },
-        {
-          role: "assistant",
-          content:
-            "Here's a status message you can use: \n\n‘We identified and resolved the authentication outage from this morning. All services are operating normally again as of 10:24 CET. Thank you for your patience while we implemented the fix.’"
-        }
-      ]
-    }
-  ];
-
-  const sidebarProjects = projectWorkspaces.map((project) => ({
-    name: project.name,
-    status: `${project.status.label} • Aktualisiert ${project.updatedAt}`,
-    collaborators: project.collaborators
-  }));
-
-  let promptInput = "";
-  let activeChatId = chatThreads[0]?.id ?? null;
-
-  $: activeChat = chatThreads.find((thread) => thread.id === activeChatId) ?? chatThreads[0];
-
-  function loadSuggestion(suggestion) {
-    promptInput = suggestion;
-  }
+  let searchQuery = "";
+  let promptDraft = "";
 </script>
 
-<section class="page">
-  <header class="page__header">
-    <div>
-      <h1>Workspace</h1>
-      <p>Design a ChatGPT-style surface for navigating prompts, projects, and custom GPTs.</p>
-    </div>
-    <button class="primary">New chat</button>
-  </header>
+<section class="workspace">
+  <aside class="sidebar">
+    <button class="card card--cta" type="button">
+      <span class="card__label">Neuer Chat</span>
+      <span class="card__icon">＋</span>
+    </button>
 
-  <div class="page__grid">
-    <aside class="panel panel--sidebar">
-      <section class="sidebar-section">
-        <header>
-          <h2>Chat</h2>
-          <button class="secondary secondary--ghost" type="button">New Chat</button>
-        </header>
-        <ul class="sidebar-list">
-          {#each chatThreads as thread}
-            <li>
-              <button
-                type="button"
-                class="sidebar-item"
-                class:active={thread.id === activeChatId}
-                on:click={() => (activeChatId = thread.id)}
-              >
-                <span class="sidebar-item__title">{thread.title}</span>
-                <span class="sidebar-item__meta">{thread.lastActive}</span>
-              </button>
-            </li>
-          {/each}
-        </ul>
-      </section>
+    <label class="card card--search">
+      <span class="card__icon" aria-hidden="true">🔍</span>
+      <input
+        type="search"
+        placeholder="Chats suchen"
+        bind:value={searchQuery}
+        aria-label="Chats suchen"
+      />
+    </label>
 
-      <section class="sidebar-section">
-        <header>
-          <h2>Projekte</h2>
-          <button class="secondary secondary--ghost" type="button">New Project</button>
-        </header>
-        <ul class="sidebar-list sidebar-list--projects">
-          {#each sidebarProjects as project}
-            <li>
-              <div class="sidebar-item sidebar-item--static">
-                <span class="sidebar-item__title">{project.name}</span>
-                <span class="sidebar-item__meta">{project.status}</span>
-                {#if project.collaborators?.length}
-                  <span class="sidebar-item__tags">
-                    {#each project.collaborators as collaborator}
-                      <span class="pill pill--tiny">{collaborator}</span>
-                    {/each}
-                  </span>
-                {/if}
-              </div>
-            </li>
-          {/each}
-        </ul>
-      </section>
+    <button class="card card--link" type="button">Bibliothek</button>
 
-      {#if activeChat}
-        <section class="sidebar-section sidebar-section--active">
-          <header>
-            <h2>Aktiver Chat</h2>
-          </header>
-          <div class="message-log">
-            {#each activeChat.messages as message}
-              <article class={`message message--${message.role}`}>
-                <span class="message__role">{message.role === "assistant" ? "GPT" : "Du"}</span>
-                <p>{message.content}</p>
-              </article>
-            {/each}
-          </div>
-          <label class="message-input">
-            <span>Compose</span>
-            <textarea
-              bind:value={promptInput}
-              rows="4"
-              placeholder="Ask a follow-up or paste a task"
-            ></textarea>
-          </label>
-          <button class="primary" disabled={!promptInput.trim()}>Send</button>
-        </section>
-      {/if}
-    </aside>
+    <section class="card card--menu">
+      <header class="card__header">
+        <h2>GPTs</h2>
+        <span class="chip">{gptMenu.count}</span>
+      </header>
+      <ul>
+        {#each gptMenu.items as item}
+          <li>
+            <button class="menu-item" type="button">{item.label}</button>
+          </li>
+        {/each}
+      </ul>
+    </section>
 
-    <main class="panel panel--main">
-      <section class="card-group">
-        <header>
-          <h2>Prompt library</h2>
-          <p>Jumpstart conversations with reusable presets curated for your team.</p>
-        </header>
-        <div class="grid">
-          {#each promptPresets as preset}
-            <article class="card">
-              <div class="card__icon">{preset.icon}</div>
-              <div class="card__body">
-                <h3>{preset.title}</h3>
-                <p>{preset.description}</p>
-                <button
-                  class="secondary secondary--ghost"
-                  type="button"
-                  on:click={() => loadSuggestion(preset.suggestions[0])}
-                >
-                  Load starter prompt
-                </button>
-                <ul>
-                  {#each preset.suggestions as suggestion}
-                    <li>
-                      <button type="button" on:click|stopPropagation={() => loadSuggestion(suggestion)}>
-                        {suggestion}
-                      </button>
-                    </li>
-                  {/each}
-                </ul>
-              </div>
-            </article>
-          {/each}
-        </div>
-      </section>
+    <section class="card card--menu">
+      <header class="card__header">
+        <h2>Projekte</h2>
+      </header>
+      <ul>
+        {#each projectMenu as item}
+          <li>
+            <button
+              class="menu-item"
+              class:menu-item--muted={item.muted}
+              type="button"
+            >
+              {#if item.accent}
+                <span class="menu-item__accent">{item.accent}</span>
+              {/if}
+              {item.label}
+            </button>
+          </li>
+        {/each}
+      </ul>
+    </section>
+  </aside>
 
-      <section class="card-group">
-        <header>
-          <h2>Project workspaces</h2>
-          <p>Open collaborative threads and keep teammates aligned across initiatives.</p>
-        </header>
-        <div class="grid grid--projects">
-          {#each projectWorkspaces as project}
-            <article class="card card--project">
-              <div class="card__header">
-                <h3>{project.name}</h3>
-                <span class={`status status--${project.status.variant}`}>{project.status.label}</span>
-              </div>
-              <p>{project.description}</p>
-              <footer>
-                <span class="pill-group">
-                  {#each project.collaborators as collaborator}
-                    <span class="pill">{collaborator}</span>
-                  {/each}
-                </span>
-                <span class="muted">Updated {project.updatedAt}</span>
-              </footer>
-            </article>
-          {/each}
-        </div>
-      </section>
+  <main class="content">
+    <header class="content__hero">
+      <h1>Was liegt heute an?</h1>
+      <form class="prompt" on:submit|preventDefault={() => {}}>
+        <input
+          type="text"
+          placeholder="Stelle irgendeine Frage"
+          bind:value={promptDraft}
+          aria-label="Prompt eingeben"
+        />
+        <button class="prompt__submit" type="submit" aria-label="Absenden">
+          <span aria-hidden="true">⮞</span>
+        </button>
+      </form>
+    </header>
 
-      <section class="card-group">
-        <header>
-          <h2>Custom GPTs</h2>
-          <p>Deploy specialized assistants with targeted knowledge and guardrails.</p>
-        </header>
-        <div class="grid grid--gpts">
-          {#each customGPTs as gpt}
-            <article class="card card--gpt">
-              <div class="card__icon card__icon--gpt">{gpt.accent}</div>
-              <div class="card__body">
-                <h3>{gpt.name}</h3>
-                <p>{gpt.description}</p>
-                <div class="pill-group">
-                  {#each gpt.capabilities as capability}
-                    <span class="pill pill--outline">{capability}</span>
-                  {/each}
-                </div>
-                <button class="secondary">Open</button>
-              </div>
-            </article>
-          {/each}
-        </div>
-      </section>
-    </main>
-  </div>
+    <section class="suggestions">
+      <h2>Vorschläge für den Start</h2>
+      <ul>
+        {#each quickPrompts as prompt}
+          <li>
+            <button class="suggestion" type="button">{prompt}</button>
+          </li>
+        {/each}
+      </ul>
+    </section>
+  </main>
 </section>
 
 <style>
   :global(body) {
     background-color: #0b0c10;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
 
-  .page {
-    padding: 2rem clamp(1rem, 4vw, 3rem);
-    color: #f8f9fb;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .page__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  .page__header h1 {
-    font-size: clamp(1.75rem, 3vw, 2.5rem);
-    margin: 0;
-  }
-
-  .page__header p {
-    margin: 0.35rem 0 0;
-    color: #aab1c0;
-  }
-
-  .page__grid {
+  .workspace {
     display: grid;
-    grid-template-columns: minmax(260px, 320px) 1fr;
-    gap: 1.5rem;
+    grid-template-columns: clamp(260px, 25vw, 320px) 1fr;
+    gap: 1.75rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    color: #f5f7fb;
+    min-height: 100vh;
   }
 
-  .panel {
-    background: rgba(26, 29, 40, 0.9);
-    border-radius: 18px;
-    padding: 1.5rem;
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.3);
+  .sidebar {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .panel--sidebar {
+    gap: 1rem;
     position: sticky;
-    top: 1.5rem;
-    height: fit-content;
-  }
-
-  .panel h2 {
-    margin: 0;
-    font-size: 1.2rem;
-  }
-
-  .sidebar-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .sidebar-section + .sidebar-section {
-    padding-top: 1.25rem;
-    border-top: 1px solid rgba(62, 70, 96, 0.6);
-  }
-
-  .sidebar-section header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-  }
-
-  .sidebar-section header h2 {
-    font-size: 1rem;
-  }
-
-  .sidebar-section--active {
-    gap: 1rem;
-  }
-
-  .sidebar-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .sidebar-item {
-    width: 100%;
-    background: rgba(17, 19, 27, 0.9);
-    border: 1px solid rgba(59, 67, 92, 0.6);
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
-    text-align: left;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
-  }
-
-  .sidebar-item:hover {
-    border-color: rgba(120, 131, 164, 0.9);
-    transform: translateY(-1px);
-  }
-
-  .sidebar-item.active {
-    border-color: rgba(99, 133, 255, 0.85);
-    background: rgba(33, 40, 64, 0.9);
-  }
-
-  .sidebar-item--static {
-    cursor: default;
-  }
-
-  .sidebar-item--static:hover {
-    transform: none;
-    border-color: rgba(59, 67, 92, 0.6);
-  }
-
-  .sidebar-item__title {
-    font-weight: 600;
-    font-size: 0.95rem;
-  }
-
-  .sidebar-item__meta {
-    font-size: 0.8rem;
-    color: #7d8bad;
-  }
-
-  .sidebar-item__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    margin-top: 0.35rem;
-  }
-
-  .sidebar-list--projects .sidebar-item {
-    gap: 0.35rem;
-  }
-
-  .message-log {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-height: 320px;
-    overflow-y: auto;
-    padding-right: 0.5rem;
-  }
-
-  .message {
-    background: rgba(18, 20, 28, 0.9);
-    border-radius: 12px;
-    padding: 0.85rem 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    border: 1px solid transparent;
-  }
-
-  .message--assistant {
-    border-color: rgba(101, 163, 255, 0.4);
-  }
-
-  .message__role {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #7d89a1;
-  }
-
-  .message p {
-    margin: 0;
-    line-height: 1.4;
-    white-space: pre-wrap;
-  }
-
-  .message-input {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-  }
-
-  .message-input textarea {
-    background: rgba(15, 16, 24, 0.9);
-    border-radius: 12px;
-    border: 1px solid rgba(84, 92, 112, 0.6);
-    padding: 0.75rem 1rem;
-    color: inherit;
-    resize: vertical;
-    min-height: 100px;
-  }
-
-  textarea::placeholder {
-    color: #5d6780;
-  }
-
-  button {
-    font: inherit;
-    border: none;
-    border-radius: 999px;
-    padding: 0.65rem 1.5rem;
-    cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-  }
-
-  button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-    transform: none;
-    box-shadow: none;
-  }
-
-  .primary {
-    background: linear-gradient(135deg, #3d8bfd, #6f57ff);
-    color: white;
-    box-shadow: 0 12px 24px rgba(63, 140, 253, 0.25);
-  }
-
-  .primary:not(:disabled):hover {
-    transform: translateY(-2px);
-  }
-
-  .secondary {
-    background: rgba(24, 27, 38, 0.9);
-    color: #d7deeb;
-    border: 1px solid rgba(103, 116, 145, 0.4);
-  }
-
-  .card-group {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .card-group header h2 {
-    margin: 0;
-    font-size: 1.2rem;
-  }
-
-  .card-group header p {
-    margin: 0.25rem 0 0;
-    color: #8f9bb3;
-  }
-
-  .grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  }
-
-  .grid--projects {
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  }
-
-  .grid--gpts {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    top: clamp(1.5rem, 3vw, 2.5rem);
+    align-self: start;
   }
 
   .card {
-    background: rgba(17, 19, 27, 0.95);
-    border-radius: 16px;
-    border: 1px solid rgba(84, 92, 112, 0.5);
-    padding: 1.25rem;
+    background: rgba(24, 27, 39, 0.92);
+    border-radius: 18px;
+    border: 1px solid rgba(88, 97, 127, 0.35);
+    padding: 1.1rem 1.25rem;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 0.75rem;
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    color: inherit;
+    text-align: left;
   }
 
-  .card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(120, 131, 164, 0.9);
+  .card--cta {
+    justify-content: space-between;
+    font-size: 1rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, rgba(79, 123, 255, 0.65), rgba(168, 85, 247, 0.6));
+    border: none;
+    cursor: pointer;
   }
 
-  .card__icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: rgba(61, 139, 253, 0.2);
-    display: grid;
-    place-items: center;
+  .card--cta .card__icon {
     font-size: 1.35rem;
   }
 
-  .card__icon--gpt {
-    background: rgba(157, 115, 255, 0.2);
+  .card--search {
+    cursor: text;
   }
 
-  .card__body h3 {
-    margin: 0;
-    font-size: 1.05rem;
-  }
-
-  .card__body p {
-    margin: 0;
-    color: #9ba7c1;
-  }
-
-  .card__body ul {
-    list-style: none;
-    padding: 0;
-    margin: 0.75rem 0 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .secondary--ghost {
-    align-self: flex-start;
-    padding-inline: 1rem;
-  }
-
-  .card__body li button {
+  .card--search input {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: inherit;
     width: 100%;
-    text-align: left;
-    background: rgba(26, 29, 40, 0.9);
-    color: #c9d2e7;
-    border-radius: 10px;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid transparent;
+    font-size: 0.95rem;
   }
 
-  .card__body li button:hover {
-    border-color: rgba(99, 133, 255, 0.5);
+  .card--link {
+    justify-content: center;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
   }
 
-  .card--project {
-    gap: 0.5rem;
+  .card--link:hover,
+  .card--link:focus-visible,
+  .menu-item:hover,
+  .menu-item:focus-visible,
+  .suggestion:hover,
+  .suggestion:focus-visible {
+    background: rgba(124, 136, 203, 0.16);
+  }
+
+  .card--menu {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
   }
 
   .card__header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     gap: 0.75rem;
   }
 
-  .status {
-    padding: 0.25rem 0.6rem;
+  .card__header h2 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .chip {
+    background: rgba(124, 136, 203, 0.2);
     border-radius: 999px;
+    padding: 0.1rem 0.6rem;
     font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: rgba(82, 91, 120, 0.3);
-    color: #dfe6ff;
+    font-weight: 600;
+    color: #cbd2ff;
   }
 
-  .status--active {
-    background: rgba(66, 180, 104, 0.25);
-    color: #a7f3c2;
-  }
-
-  .status--in-review {
-    background: rgba(63, 140, 253, 0.25);
-    color: #c7daff;
-  }
-
-  .status--scheduled {
-    background: rgba(252, 211, 77, 0.25);
-    color: #fcd34d;
-  }
-
-  .pill-group {
+  .card--menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.35rem;
   }
 
-  .pill {
-    background: rgba(59, 64, 85, 0.7);
-    color: #d0d7eb;
-    border-radius: 999px;
-    padding: 0.25rem 0.65rem;
-    font-size: 0.75rem;
+  .menu-item {
+    width: 100%;
+    background: rgba(47, 53, 75, 0.55);
+    border: 1px solid rgba(88, 97, 127, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem 0.9rem;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: background 0.2s ease, border 0.2s ease;
   }
 
-  .pill--outline {
+  .menu-item--muted {
+    color: #aab1c5;
+  }
+
+  .menu-item__accent {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(203, 210, 255, 0.16);
+    border-radius: 8px;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .content {
+    background: rgba(24, 27, 39, 0.78);
+    border-radius: 28px;
+    border: 1px solid rgba(88, 97, 127, 0.25);
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    box-shadow: 0 40px 60px rgba(5, 7, 15, 0.45);
+  }
+
+  .content__hero h1 {
+    font-size: clamp(2rem, 5vw, 2.9rem);
+    margin: 0 0 1.75rem;
+  }
+
+  .prompt {
+    background: rgba(12, 14, 24, 0.85);
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem 0.75rem 1.25rem;
+    border: 1px solid rgba(88, 97, 127, 0.35);
+  }
+
+  .prompt input {
+    flex: 1;
     background: transparent;
-    border: 1px solid rgba(126, 140, 173, 0.6);
+    border: none;
+    outline: none;
+    color: inherit;
+    font-size: 1.05rem;
   }
 
-  .pill--tiny {
-    padding: 0.2rem 0.55rem;
-    font-size: 0.7rem;
-    background: rgba(46, 52, 72, 0.8);
+  .prompt__submit {
+    border: none;
+    background: rgba(76, 108, 255, 0.9);
+    color: #fff;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: transform 0.2s ease, background 0.2s ease;
   }
 
-  .muted {
-    color: #7d8bad;
-    font-size: 0.8rem;
+  .prompt__submit:hover,
+  .prompt__submit:focus-visible {
+    transform: translateX(2px);
+    background: rgba(113, 93, 255, 0.95);
   }
 
-  @media (max-width: 960px) {
-    .page__grid {
+  .suggestions h2 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #aab1c5;
+  }
+
+  .suggestions ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .suggestion {
+    background: rgba(47, 53, 75, 0.6);
+    border: 1px solid rgba(88, 97, 127, 0.25);
+    border-radius: 16px;
+    color: inherit;
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s ease, border 0.2s ease;
+  }
+
+  @media (max-width: 1024px) {
+    .workspace {
       grid-template-columns: 1fr;
     }
 
-    .panel--sidebar {
+    .sidebar {
       position: static;
-      order: 2;
+      flex-direction: row;
+      flex-wrap: wrap;
     }
 
-    .panel--main {
-      order: 1;
+    .card {
+      flex: 1 1 calc(50% - 0.5rem);
+    }
+
+    .card--menu {
+      flex: 1 1 100%;
     }
   }
 </style>
