@@ -12,14 +12,23 @@ if sys.version_info >= (3, 13):  # pragma: no cover - runtime safeguard
     # older call signature while delegating to the updated implementation.
     _original_evaluate = ForwardRef._evaluate
 
-    def _patched_evaluate(self, globalns, localns, recursive_guard=None):
+    def _patched_evaluate(self, globalns, localns, *args, **kwargs):
+        if args:
+            recursive_guard = args[0]
+            args = args[1:]
+        else:
+            recursive_guard = kwargs.get("recursive_guard")
+
         if recursive_guard is None:
             recursive_guard = set()
+
+        kwargs["recursive_guard"] = recursive_guard
         return _original_evaluate(
             self,
             globalns,
             localns,
-            recursive_guard=recursive_guard,
+            *args,
+            **kwargs,
         )
 
     ForwardRef._evaluate = _patched_evaluate  # type: ignore[attr-defined]
