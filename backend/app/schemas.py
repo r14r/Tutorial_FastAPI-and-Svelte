@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, constr
+from pydantic import BaseModel, ConfigDict, EmailStr, constr, field_validator
 
 
 class Token(BaseModel):
@@ -19,6 +19,13 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     # bcrypt rejects passwords longer than 72 bytes, so enforce the limit early
     password: constr(max_length=72)
+
+    @field_validator("password")
+    @classmethod
+    def password_must_fit_bcrypt(cls, value: str) -> str:
+        if len(value.encode("utf-8")) > 72:
+            raise ValueError("Password must be at most 72 bytes when encoded as UTF-8")
+        return value
 
 
 class UserRead(UserBase):
