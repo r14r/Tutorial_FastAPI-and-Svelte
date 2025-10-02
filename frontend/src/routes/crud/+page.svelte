@@ -1,8 +1,8 @@
 <script>
   import { onDestroy } from "svelte";
   import { get } from "svelte/store";
-  import { createItem, deleteItem, getItems, updateItem } from "../lib/api";
-  import { token, currentUser } from "../stores/auth";
+  import { createItem, deleteItem, getItems, updateItem } from "$lib/api";
+  import { token, currentUser } from "$stores/auth";
 
   let items = [];
   let total = 0;
@@ -215,27 +215,26 @@
 
   @media (min-width: 960px) {
     .crud-layout {
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 360px 1fr;
       align-items: start;
     }
   }
 
   header {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: flex-start;
     gap: 1rem;
     margin-bottom: 1.25rem;
   }
 
   header h2 {
-    margin: 0 0 0.35rem;
+    margin: 0;
   }
 
   header p {
-    margin: 0;
+    margin: 0.35rem 0 0;
     color: #4a5568;
-    font-size: 0.95rem;
   }
 
   form {
@@ -253,7 +252,7 @@
   textarea {
     border: 1px solid #cbd5e0;
     border-radius: 0.85rem;
-    padding: 0.7rem 0.85rem;
+    padding: 0.75rem 0.9rem;
     font-size: 1rem;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
@@ -261,8 +260,8 @@
   input:focus,
   textarea:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
   }
 
   textarea {
@@ -271,7 +270,7 @@
 
   .actions {
     display: flex;
-    gap: 0.75rem;
+    gap: 1rem;
     flex-wrap: wrap;
   }
 
@@ -280,27 +279,23 @@
     border-radius: 999px;
     padding: 0.65rem 1.4rem;
     font-weight: 600;
-    background: linear-gradient(135deg, #4299e1, #667eea);
+    background: linear-gradient(135deg, #6366f1, #22d3ee);
     color: white;
-    transition: filter 0.2s ease;
+  }
+
+  button.secondary {
+    background: rgba(79, 70, 229, 0.12);
+    color: #3730a3;
+  }
+
+  button.danger {
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    color: white;
   }
 
   button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-  }
-
-  button:not(:disabled):hover {
-    filter: brightness(1.05);
-  }
-
-  .secondary {
-    background: #edf2f7;
-    color: #2d3748;
-  }
-
-  .danger {
-    background: #f56565;
   }
 
   ul {
@@ -312,12 +307,11 @@
   }
 
   li {
-    display: flex;
-    gap: 1rem;
-    justify-content: space-between;
-    border: 1px solid #e2e8f0;
-    border-radius: 1rem;
+    display: grid;
+    gap: 0.75rem;
     padding: 1rem;
+    border-radius: 1rem;
+    background: rgba(99, 102, 241, 0.06);
   }
 
   .item-copy h3 {
@@ -331,40 +325,24 @@
 
   .item-actions {
     display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  .empty {
-    color: #718096;
+    gap: 0.75rem;
   }
 
   .feedback {
     margin-top: 1.5rem;
     padding: 0.85rem 1rem;
-    border-radius: 0.9rem;
+    border-radius: 1rem;
     font-weight: 600;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
   }
 
   .feedback.error {
-    background: #fed7d7;
-    color: #742a2a;
+    background: #fee2e2;
+    color: #991b1b;
   }
 
   .feedback.success {
     background: #c6f6d5;
     color: #22543d;
-  }
-
-  @media (max-width: 640px) {
-    li {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .item-actions {
-      justify-content: flex-end;
-    }
   }
 </style>

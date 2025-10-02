@@ -1,8 +1,8 @@
 <script>
   import { onDestroy } from "svelte";
   import { get } from "svelte/store";
-  import { getItems } from "../lib/api";
-  import { token } from "../stores/auth";
+  import { getItems } from "$lib/api";
+  import { token } from "$stores/auth";
 
   let query = { skip: 0, limit: 5 };
   let autoRun = true;
@@ -198,60 +198,60 @@
   }
 
   header {
+    display: grid;
+    gap: 0.25rem;
     margin-bottom: 1.1rem;
   }
 
   header h2 {
-    margin: 0 0 0.35rem;
+    margin: 0;
   }
 
   header p {
     margin: 0;
     color: #4a5568;
-    font-size: 0.95rem;
   }
 
   .control-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 1rem;
-    flex-wrap: wrap;
+    margin-bottom: 1rem;
   }
 
   label {
     display: grid;
-    gap: 0.35rem;
+    gap: 0.45rem;
     font-weight: 600;
   }
 
   input[type="number"] {
     border: 1px solid #cbd5e0;
     border-radius: 0.85rem;
-    padding: 0.6rem 0.85rem;
+    padding: 0.65rem 0.85rem;
     font-size: 1rem;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   input[type="number"]:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
   }
 
   .toggle {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    font-weight: 600;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
   }
 
   button {
     border: none;
     border-radius: 999px;
-    padding: 0.65rem 1.4rem;
+    padding: 0.65rem 1.5rem;
     font-weight: 600;
-    background: linear-gradient(135deg, #4299e1, #667eea);
+    background: linear-gradient(135deg, #6366f1, #22d3ee);
     color: white;
-    transition: filter 0.2s ease;
   }
 
   button:disabled {
@@ -259,19 +259,15 @@
     cursor: not-allowed;
   }
 
-  button:not(:disabled):hover {
-    filter: brightness(1.05);
-  }
-
   .hint {
-    margin: 0;
-    color: #718096;
+    margin: 0.75rem 0 0;
+    color: #475569;
     font-size: 0.9rem;
   }
 
   dl {
     display: grid;
-    gap: 0.75rem;
+    gap: 0.85rem;
     margin: 0;
   }
 
@@ -282,42 +278,45 @@
 
   dd {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     font-weight: 700;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    overflow: hidden;
-    border-radius: 1rem;
+    margin-top: 1rem;
   }
 
   th,
   td {
-    padding: 0.75rem 0.9rem;
     text-align: left;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 0.65rem 0.75rem;
   }
 
   thead {
-    background: #edf2f7;
+    background: rgba(99, 102, 241, 0.12);
   }
 
-  tbody tr:nth-child(odd) {
-    background: rgba(237, 242, 247, 0.4);
+  tbody tr:nth-child(even) {
+    background: rgba(148, 163, 184, 0.12);
   }
 
   .feedback {
     margin-bottom: 1rem;
     padding: 0.85rem 1rem;
-    border-radius: 0.9rem;
+    border-radius: 1rem;
     font-weight: 600;
-    background: #fed7d7;
-    color: #742a2a;
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+  }
+
+  .feedback.error {
+    background: #fee2e2;
+    color: #991b1b;
   }
 
   .empty {
-    color: #718096;
+    margin: 0;
+    color: #4a5568;
   }
 </style>
