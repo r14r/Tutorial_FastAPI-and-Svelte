@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, constr, field_validator
 
@@ -58,3 +58,37 @@ class ItemRead(ItemBase):
 class PaginatedItems(BaseModel):
     items: List[ItemRead]
     total: int
+
+
+class OllamaMessage(BaseModel):
+    role: str
+    content: str
+
+
+class OllamaBaseRequest(BaseModel):
+    model: str
+    options: Optional[Dict[str, Any]] = None
+    keep_alive: Optional[str | int] = None
+
+    model_config = ConfigDict(extra="allow")
+
+
+class OllamaChatRequest(OllamaBaseRequest):
+    messages: List[OllamaMessage]
+    format: Optional[str] = None
+    stream: bool = False
+
+
+class OllamaGenerateRequest(OllamaBaseRequest):
+    prompt: Optional[str] = None
+    input: Optional[str] = None
+    system: Optional[str] = None
+    template: Optional[str] = None
+    context: Optional[List[int]] = None
+    stream: bool = False
+
+
+class OllamaPullRequest(BaseModel):
+    model: str
+    insecure: Optional[bool] = None
+    stream: bool = True
