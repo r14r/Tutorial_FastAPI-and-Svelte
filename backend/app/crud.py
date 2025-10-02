@@ -31,7 +31,7 @@ def list_items(db: Session, owner_id: int, skip: int = 0, limit: int = 20) -> Tu
 
 
 def create_item(db: Session, item: schemas.ItemCreate, owner_id: int) -> models.Item:
-    db_item = models.Item(**item.dict(), owner_id=owner_id)
+    db_item = models.Item(**item.model_dump(), owner_id=owner_id)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -46,7 +46,7 @@ def update_item(db: Session, item_id: int, item: schemas.ItemUpdate, owner_id: i
     )
     if not db_item:
         return None
-    for key, value in item.dict(exclude_unset=True).items():
+    for key, value in item.model_dump(exclude_unset=True).items():
         setattr(db_item, key, value)
     db.commit()
     db.refresh(db_item)
