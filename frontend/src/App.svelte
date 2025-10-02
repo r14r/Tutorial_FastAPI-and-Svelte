@@ -12,6 +12,7 @@
   import DatabasePage from "./pages/Database.svelte";
   import CorePage from "./pages/Core.svelte";
   import ChatGPTPage from "./pages/ChatGPT.svelte";
+  import OllamaChatPage from "./pages/OllamaChat.svelte";
 
   const sections = [
     {
@@ -57,6 +58,15 @@
         "Play with reactivity, bindings, and stores in an isolated playground that mirrors the workshop exercises.",
       href: "/core",
       icon: "✨",
+      requiresAuth: false
+    },
+    {
+      id: "ollama-chat",
+      title: "Ollama Chat",
+      description:
+        "Sende Prompts an dein Ollama-Backend und beobachte gestreamte Antworten in Echtzeit.",
+      href: "/ollama",
+      icon: "💬",
       requiresAuth: false
     },
     {
@@ -115,7 +125,8 @@
     ["/crud", CrudPage],
     ["/database", DatabasePage],
     ["/core", CorePage],
-    ["/chatgpt", ChatGPTPage]
+    ["/chatgpt", ChatGPTPage],
+    ["/ollama", OllamaChatPage]
   ]);
 
   let openMenu = null;
