@@ -2,7 +2,25 @@
 from __future__ import annotations
 
 import sys
+import types
 from typing import ForwardRef
+
+
+try:  # pragma: no cover - defensive import
+    import bcrypt  # type: ignore[import-not-found]
+except Exception:  # pragma: no cover - bcrypt might not be installed yet
+    bcrypt = None  # type: ignore[assignment]
+
+
+if bcrypt is not None and not hasattr(bcrypt, "__about__"):
+    # Passlib 1.7 relies on the ``bcrypt`` package exposing a ``__about__``
+    # module with a ``__version__`` attribute. Bcrypt 4 removed that module,
+    # keeping only a top-level ``__version__`` string which triggers an
+    # ``AttributeError`` during Passlib's import phase. Recreate the missing
+    # module so Passlib can read the version it expects. ``types.SimpleNamespace``
+    # mirrors the previous module object closely enough for Passlib's needs.
+    about = types.SimpleNamespace(__version__=getattr(bcrypt, "__version__", ""))
+    bcrypt.__about__ = about  # type: ignore[attr-defined]
 
 
 if sys.version_info >= (3, 13):  # pragma: no cover - runtime safeguard
