@@ -1,9 +1,19 @@
 {
-  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "allowJs": true,
-    "checkJs": false
+    "checkJs": false,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "lib": ["dom", "esnext"],
+    "types": ["svelte"],
+    "baseUrl": ".",
+    "paths": {
+      "$app/*": ["src/stubs/app/*"],
+      "$lib/*": ["src/lib/*"],
+      "$stores/*": ["src/lib/stores/*"]
+    }
   },
   "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.svelte", "vite.config.js"],
-  "exclude": ["node_modules", "build"]
+  "exclude": ["node_modules", "dist"]
 }
